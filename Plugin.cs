@@ -1,13 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BepInEx;
 using BepInEx.Logging;
-using GameNetcodeStuff;
 using HarmonyLib;
-using UnityEngine;
 
 namespace LCOpenDoors
 {
@@ -33,8 +28,7 @@ namespace LCOpenDoors
     [HarmonyPatch]
     internal class GamePatcher
     {
-        // read chat
-        
+        // chat patch
         [HarmonyPatch(typeof(HUDManager), "SubmitChat_performed")]
         [HarmonyPrefix]
         static void HUDPatch(ref HUDManager __instance)
@@ -66,9 +60,10 @@ namespace LCOpenDoors
             // list doors
             if (command == "doors")
             {
+                Plugin.mls.LogInfo($"List of Big Doors on current level ({GamePatcher.bigDoors.Length}):");
                 foreach (TerminalAccessibleObject door in GamePatcher.bigDoors)
                 {
-                    Plugin.mls.LogMessage(door.objectCode);
+                    Plugin.mls.LogInfo(door.objectCode);
                 }
                 return true;
             }
@@ -81,7 +76,7 @@ namespace LCOpenDoors
                 if (matchingObject != null)
                 {
                     matchingObject.SetDoorOpenServerRpc(true);
-                    Plugin.mls.LogInfo($"Door {command} opened");
+                    Plugin.mls.LogInfo($"Door '{command}' opened");
                     return true;
                 } 
                 Plugin.mls.LogInfo($"Door '{command}' not in level");
